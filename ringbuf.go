@@ -44,9 +44,9 @@ func (b *Buffer) getSliceForInbound() []byte {
 	}
 	end := b.inboundPos - b.buffered
 	if end < 0 {
-		return b.data[b.inboundPos:]
+		return b.data[b.inboundPos : len(b.data)+end]
 	} else {
-		return b.data[b.inboundPos:end]
+		return b.data[b.inboundPos:]
 	}
 }
 

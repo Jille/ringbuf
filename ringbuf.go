@@ -130,8 +130,9 @@ func (b *Buffer) WriteTo(w io.Writer) (int64, error) {
 		if eof {
 			return int64(written), nil
 		}
+		isClosed := b.eof
 		em.Unlock()
-		if len(ready) > maxWrite {
+		if len(ready) > maxWrite && !isClosed {
 			// Use smaller writes so we free up regions of the buffer faster if w is blocking.
 			ready = ready[:maxWrite]
 		}

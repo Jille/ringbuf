@@ -73,7 +73,7 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	for len(p) > 0 {
 		buf := b.getSliceForInbound()
 		n := copy(buf, p)
-		b.inboundPos += n
+		b.inboundPos = (b.inboundPos + n) % len(b.data)
 		b.buffered += n
 		p = p[n:]
 		b.cond.Signal()
@@ -92,7 +92,7 @@ func (b *Buffer) ReadFrom(r io.Reader) (int64, error) {
 		n, err := r.Read(buf)
 		em.Lock()
 		read += n
-		b.inboundPos += n
+		b.inboundPos = (b.inboundPos + n) % len(b.data)
 		b.buffered += n
 		b.cond.Signal()
 		if err != nil {

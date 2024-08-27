@@ -40,6 +40,7 @@ func (b *BufferedWriter) Write(p []byte) (int, error) {
 // Close promises no more Write calls will happen.
 // Close blocks until all data is flushed and returns the error from the writer.
 // Close may not be called concurrently with itself or Write.
+// Close does not close the underlying writer.
 func (b *BufferedWriter) Close() error {
 	if b.err != nil {
 		return b.err

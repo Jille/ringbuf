@@ -72,7 +72,13 @@ func (b *Buffer) Write(p []byte) (int, error) {
 	ret := len(p)
 	for len(p) > 0 {
 		buf := b.getSliceForInbound()
+		if len(p) > 1024 && len(buf) > 1024 {
+			b.mtx.Unlock()
+		}
 		n := copy(buf, p)
+		if len(p) > 1024 && len(buf) > 1024 {
+			b.mtx.Lock()
+		}
 		b.inboundPos = (b.inboundPos + n) % len(b.data)
 		b.buffered += n
 		p = p[n:]
@@ -148,7 +154,13 @@ func (b *Buffer) Read(p []byte) (int, error) {
 	if eof {
 		return 0, io.EOF
 	}
+	if len(p) > 1024 && len(ready) > 1024 {
+		b.mtx.Unlock()
+	}
 	n := copy(p, ready)
+	if len(p) > 1024 && len(ready) > 1024 {
+		b.mtx.Lock()
+	}
 	b.buffered -= n
 	b.cond.Signal()
 	return n, nil
